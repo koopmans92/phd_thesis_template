@@ -1,0 +1,7 @@
+ \Title{Title}
+ \Subject{physics, experimental physics, accelerator physics}
+ \Author{Name Name}
+ \Keywords{keyword1, keyword2, keyword3, keyword4; Stichwort1, Stichwort2, Stichwort3, Stichwort4}
+ \Publisher{Humboldt-Universität zu Berlin}
+ \setRGBcolorprofile{./color/eciRGB_v2.icc}{eciRGB_v2}{ECI RGB}{http://www.eci.org/en/start}
+ 

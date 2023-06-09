@@ -1,0 +1,649 @@
+%=============================================================
+% DOCUMENTCLASS
+%=============================================================
+%/* cSpell:disable */
+\documentclass[
+    fontsize=12pt,			      	% Schriftgroesse
+	  paper=A4,				          	% Papierformat
+	  bibliography=totocnumbered,	% Literaturverzeichnis ins Inhaltsverzeichnis
+    numbers=noenddot,           % no dos for headings, etc ...
+	  DIV=14,		                  % führt die Satzspiegelberechnung neu aus
+    BCOR=15mm,         		    	% Bindekorrektur, liegt je nach Druck zwischen 8-15mm 
+    parskip=half-,              % Spacing between paragraphs
+    ]{scrbook}
+%=============================================================
+% PACKAGES
+%=============================================================
+% use KOMA float envs (otherwise warning: float@addtolists)
+\usepackage{scrhack}
+% set indent for captions
+% indent begins in second line at 10pt indent, caption starts directly after e.g. Figure X.X: Caption
+\setcapindent{10pt}
+\setlength{\parindent}{15pt}
+% First line is not filled with caption, caption starts in second line with 10pt indent. e.g. Figure X.X: is alone in the line above
+%\setcapindent*{10pt}
+% requirements for publication on the edoc-Server of the HU Berlin: PDF/A-1b (includes load of hyperref -> links for TOC/CITE/SYMBOLS)
+\usepackage[a-1b]{pdfx}
+    \hypersetup{
+        % bookmarks in pdfreader numbered like TOC
+        bookmarksnumbered=true,
+        %colorlinks=true,   % !!! comment for printing !!!
+        %linkcolor={red},   % !!! comment for printing !!!
+        %citecolor={red},   % !!! comment for printing !!!
+        %urlcolor={blue},   % !!! comment for printing !!!
+        hidelinks,        % !!! uncomment for printing !!!
+        %backref=page,
+        % encoding ...
+        pdfencoding=unicode,
+        % additional math macros are supported in bookmarks
+        psdextra}
+% Font encoding of the .pdf file
+\usepackage[T1]{fontenc}
+% Type encoding of the .tex file - depends on editor/ide
+\usepackage[utf8]{inputenc}
+% Set Language for correct date format and wordsplitting
+\usepackage[main=english,german]{babel}
+% fvextra required for linebreaks in code insertions/ verbatim and must be loaded before csquotes
+\usepackage{fvextra}
+% When using babel or polyglossia with biblatex, loading csquotes is recommended to ensure that quoted texts are typeset according to the rules of your main language
+\usepackage{csquotes}
+% filecontents aftr \documentclass declaration and with overwrite
+\usepackage{newfile}
+% custom date and time format
+\usepackage{datetime}
+% package for op­tional ar­gu­ments to the \in­clude­graph­ics command
+\usepackage{graphicx}
+    \graphicspath{{figures/}}
+% write in pictures
+%\usepackage[percent]{overpic}
+% add shipout routiness for output at fixed position 
+\usepackage{eso-pic}
+% transparent graphics
+\usepackage{transparent}
+% some math commands (eqref, ...)
+\usepackage{amsmath}
+\usepackage{amssymb}
+% bold math symbols
+\usepackage{bm}
+\DeclareMathOperator*{\dprime}{\prime \prime}
+% ifthenelse 
+\usepackage{ifthen}
+% for custom dx - das brauch ich wohl nicht ...
+%\newcommand*{\D}[2][]{
+%    \ifthenelse{\equal{#1}{}}
+%    % #1 is empty
+%    {\mathop{}\!\mathrm{d}{#2}}
+%    % #1 is not empty
+%    {\mathop{}\!\mathrm{d^{#1}}\mkern-1.5mu{#2}}
+%    }
+% multiline boxed equations
+\usepackage{empheq}
+\newcommand*\widefbox[1]{\fbox{\hspace{2em}#1\hspace{2em}}}
+\usepackage{bbold}
+% some more math commands (coloneqq)
+\usepackage{mathtools}
+% Intermix single and multiple columns
+\usepackage{multicol}
+% cells spanning multiple rows in table
+\usepackage{multirow}
+% enumerate in caption
+\usepackage{caption}
+% hline without crossingg multirow cells
+\usepackage{hhline}
+% spacing in description customizable
+\usepackage{enumitem}
+% to integrate full pdf pages -> signed declaration
+\usepackage{pdfpages}
+% package to determine widths, etc, not needed for final build
+%\usepackage{layouts}
+% show page numbers for used refs
+% \usepackage{backref}
+% SI units
+\usepackage{siunitx}
+\DeclareSIUnit\permille{\text{\textperthousand}}
+% hyperref/links on each entry of list of symbols [nopostdot, nomain, makeindex, acronym, toc, ucmark]
+% acronym option automatically gives a acroym glossary with \newacronym to add enties, customisations later ...
+\usepackage[acronym, toc, sort=def]{glossaries}
+% define other glossaries, main will not be used
+\newglossary*{symbols}{List of Symbols}
+\newglossary*{constants}{List of Constants}
+% for sorting option 1 is used with \printnoidxglossary later in the document
+\makenoidxglossaries
+% for more elaborate sorting more work to be done
+% new glossaries have to be defined by following with more keys
+% \newglossary[glg]{LABEL=TYPE}{gls}{glo}{TITLE}   
+% (glg/gls/glo - file extensions used by makeindex/xindy)
+%\newglossary[ch1]{symbols}{ch2}{ch3}{List of Symbols}
+%\newglossary[alg]{acronyms}{acr}{acn}{List of Acronyms}
+% allow placement of objects as float (H)
+% In the case of Options 2 or 3, all glossary definitions must come before\makeglossaries. (Entrydefinitions  should  come  after\makeglossaries.) 
+\usepackage{float}
+% use \FloatBarrier to stop floats drifting to other sections and make sections automatic floatbarriers
+\usepackage[section]{placeins}
+%
+\usepackage{wrapfig}
+%
+\usepackage{tikz}
+% uncomment for final runs .. takes more time
+\usepackage{microtype}
+%
+\usepackage{tikz-3dplot}
+% dummy text for tests
+%\usepackage{lipsum}
+% references
+\usepackage[hyperref=true, 
+            backend=biber, 
+            sorting=none, 
+            giveninits=true,
+            citestyle=numeric-comp]{biblatex}
+% unicode in bib
+\usepackage{newunicodechar}
+% \newunicodechar{å}{\aa} %is this neccessary?!
+% Code Insertions from Python Pygments
+\usepackage{color}
+% package for horizontal lines in tables
+\usepackage{booktabs}
+% package for verbatim style ... needed?
+\usepackage{fancyvrb}
+%
+\usepackage[most]{tcolorbox}
+\input{figures/code/preamble}
+\definecolor{jupyter_frameblue}{RGB}{33,150,243}
+\definecolor{jupyter_framegrey}{RGB}{153,153,153}
+\definecolor{jupyter_titlebgblack}{RGB}{97,97,97}
+\definecolor{jupyter_contbggrey}{RGB}{245,245,245}
+\definecolor{jupyter_stdtext}{RGB}{241,241,241}
+% break paragraphs correctly whith one blank line inbetween in tex file, NO included in KOMA
+% \usepackage{parskip}
+% do not split citations over multiple lines / pages
+%\usepackage{breakcites}
+% get textwidth and -height: \printinunitsof{in}\prntlen{\textwidth} \printinunitsof{in}\prntlen{\textheight}
+% \usepackage{layouts}
+% biblatex modifications
+\ExecuteBibliographyOptions{isbn=false, doi=true, url=false}
+\ExecuteBibliographyOptions{backref=true}
+\ExecuteBibliographyOptions{abbreviate=true}
+\ExecuteBibliographyOptions{eprint=false}
+\DefineBibliographyStrings{english}{%
+  bibliography = {References},
+}
+% add brackets to supercite, not redifine cite here!
+\DeclareCiteCommand{\supercite}[\mkbibsuperscript]
+  {\bibopenbracket
+   \usebibmacro{cite:init}%
+   \let\multicitedelim=\supercitedelim
+   \iffieldundef{prenote}
+     {}
+     {\BibliographyWarning{Ignoring prenote argument}}%
+   \iffieldundef{postnote}
+     {}
+     {\BibliographyWarning{Ignoring postnote argument}}}
+  {\usebibmacro{citeindex}%
+   \usebibmacro{cite:comp}}
+  {}
+  {\usebibmacro{cite:dump}%
+   \bibclosebracket}
+% redefine cite, IF wanted!
+% \let\cite\supercite
+% Stuff after(!) hyperref
+%\DeclareFieldFormat*{title}{\usebibmacro{string}{\mkbibquote{#1}}}
+\newbibmacro{string+doiurlisbn}[1]{%
+  \iffieldundef{url}{%
+    \iffieldundef{doi}{%    
+      #1
+     }{%
+       \href{http://dx.doi.org/\thefield{doi}}{#1}%
+    }%
+  }{%
+      \href{\thefield{url}}{#1}%
+  }%
+}
+\DeclareFieldFormat*{title}{\usebibmacro{string+doiurlisbn}{\mkbibquote{#1}}}
+\renewcommand\newunitpunct{\addcomma\addspace} % komma instead fullstop!!!!
+%
+\addbibresource{bibliography.bib}
+%
+% fix style of articles in references
+% not combine issue and date (why would one even do this?!),
+% date at the end issue directly after vol 
+% style is now -> Papername Volnr(Issuenr), pp. xx, date 
+\newbibmacro*{journal+issuemod}{%
+  \usebibmacro{journal}%
+  \setunit*{\addspace}%
+  \iffieldundef{series}
+    {}
+    {\newunit
+     \printfield{series}%
+     \setunit{\addspace}}%
+  \usebibmacro{volume+number+eid}%
+  \setunit{}% space between vol-(issue)
+%  \usebibmacro{issue+date}%
+  \iffieldundef{issue}
+   {}
+   {\printtext[parens]{%
+    \printfield{issue}}}
+  \setunit{\addcolon\space}%
+  \usebibmacro{issue}%
+  \newunit}
+\DeclareBibliographyDriver{article}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author/translator+others}%
+  \setunit{\printdelim{nametitledelim}}\newblock
+  \usebibmacro{title}%
+  \newunit
+  \printlist{language}%
+  \newunit\newblock
+  \usebibmacro{byauthor}%
+  \newunit\newblock
+  \usebibmacro{bytranslator+others}%
+  \newunit\newblock
+  \printfield{version}%
+  \newunit\newblock
+  \usebibmacro{in:}%
+  \usebibmacro{journal+issuemod}%
+  \newunit
+  \usebibmacro{byeditor+others}%
+  \newunit
+  \usebibmacro{note+pages}%
+  \newunit\newblock
+  \usebibmacro{date}
+  \newunit\newblock
+  \iftoggle{bbx:isbn}
+    {\printfield{issn}}
+    {}%
+  \newunit\newblock
+  \usebibmacro{doi+eprint+url}%
+  \newunit\newblock
+  \usebibmacro{addendum+pubstate}%
+  \setunit{\bibpagerefpunct}\newblock
+  \usebibmacro{pageref}%
+  \newunit\newblock
+  \iftoggle{bbx:related}
+    {\usebibmacro{related:init}%
+     \usebibmacro{related}}
+    {}%
+  \usebibmacro{finentry}}
+%
+%\usepackage{rotating}
+%% modern implementation of bookmarks without .out files
+%\usepackage{bookmark}
+%% landscape formated pages with \begin{landscape}
+%%\usepackage{pdflscape}
+%% Linespacing
+%\usepackage[onehalfspacing]{setspace}
+%% sorted lists http://ctan.org/pkg/datatool
+%\usepackage{datatool}
+%\usepackage{array}
+%\usepackage{longtable}
+%\usepackage{bmpsize}
+%\usepackage{amsfonts}
+%\usepackage{mathrsfs}
+%\usepackage{cancel}
+%\usepackage{braket}
+%\usepackage{dsfont}
+%% tikz environment for cartoons (includes pgfkeys)
+%\usepackage{xcolor}
+%\usepackage{pgfplots}
+%\pgfplotsset{compat=newest}
+%\usetikzlibrary{angles,quotes,babel,intersections}
+%\usepackage[numbered,framed]{mcode}
+%
+%=============================================================
+% SHORTCUTS & FORMAT SETTINGS
+%=============================================================
+\newcommand{\bii}[0]{\gls{bessy}~II}
+\newcommand{\biih}[0]{\glsentryshort{bessy}~II}
+\newcommand{\biit}[0]{\glstext{bessy}~II}
+\newcommand{\bvsr}[0]{\gls{bessy}~\gls{vsr}}
+\newcommand{\bvsrh}[0]{\glsentryshort{bessy}~\glsentryshort{vsr}}
+\newcommand{\bvsrt}[0]{\glstext{bessy}~\glstext{vsr}}
+\newcommand{\pdfpng}[1]{\includegraphics{#1.png}}
+\newcommand{\bb}[1]{\textbf{#1}}
+\newcommand{\Synin}{\mathcal{I}}
+\newcommand{\unity}{\mathds{1}}
+\newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
+\newcommand{\eqn}[1]{\begin{align}#1\end{align}}
+\newcommand{\eqnb}[1]{\begin{equation}\boxed{\begin{aligned}#1\end{aligned}}\end{equation}}
+\newcommand{\eql}[1]{\begin{flalign*}#1\end{flalign*}}
+\newcommand{\eqnl}[1]{\begin{flalign}#1\end{flalign}}
+\newcommand{\tikpik}[1]{\input{content/figures/tikz/#1}}
+% cleverref for easy referencing
+\usepackage[capitalize]{cleveref}
+\Crefname{figure}{Figure}{Figures}
+\crefname{figure}{Fig.}{Figs.}
+\Crefname{table}{Table}{Tables}
+\crefname{table}{Tab.}{Tabs.}
+% remove parenthesis from equation references
+\creflabelformat{equation}{#2#1#3}
+%
+% use symbols for footnotes instead of numbers ... only really needed when superscripting citations ...
+%\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+%
+% fix spacings of \left(, \right), etc. not sure if neccessary
+\let\originalleft\left
+\let\originalright\right
+% this should be solved differently .....
+%\renewcommand{\l}{\mathopen{}\mathclose\bgroup\originalleft}
+%\renewcommand{\r}{\aftergroup\egroup\originalright}
+% fix table stuff ... out until needed
+% \newcommand{\specialcell}[2][c]{%
+%     \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+% fix lost accent macro \r
+%\let\ringaccent\r
+%\def\aa{\ringaccent a}
+%\def\AA{\ringaccent A}
+% ...
+\newdateformat{monthyeardate}{
+  \monthname[\THEMONTH], \THEYEAR}
+\DeclareMathOperator{\FT}{\mathscr{F}}
+\DeclareMathOperator{\sgn}{sgn}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+% Swap the definition of \abs* and \norm*, so that \abs
+% and \norm resizes the size of the brackets, and the 
+% starred version does not.
+\makeatletter
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+%
+\let\oldnorm\norm
+\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+\makeatother
+%
+% prevent footnote spread on multiple pages!
+%\interfootnotelinepenalty=10000
+\widowpenalty10000
+\clubpenalty10000
+%=============================================================
+% CUSTOM ENVIRONMENTS
+%=============================================================
+\newenvironment{abstract}
+    {\cleardoublepage\null\vfill\begin{center}
+    \bfseries\abstractname\end{center}}
+    {\vfill\null}
+%\newenvironment{acknowledgements}
+%    {\cleardoublepage\null\vfill\begin{center}
+%    \bfseries Acknowledgements\end{center}}
+%    {\vfill\null}
+%\newenvironment{declaration}
+%    {\cleardoublepage\null\vfill\begin{center}
+%    \bfseries Declaration\end{center}}
+%    {\vfill\null}
+%\newenvironment{mydedication}
+%    {\cleardoublepage\null\vfill\begin{center}
+%    \bfseries Dedication\end{center}}
+%    {\vfill\null}
+%
+% new columtypes for glossaries
+\newcolumntype{x}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{y}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+%=============================================================
+% GLOSSARY FOR ABBREVIATIONS/ ACRONYMS
+%=============================================================
+% side-effects. Instead use \glsentrytext for regular entries and one of
+% Don’t use \gls in chapter or section headings as it can have some unpleasant
+% \glsentryshort, \glsentrylong or \glsentryfull for acronyms.
+% Alternatively use glossaries-extra which provides special commands for use in section headings, such as \glsfmtshort{hlabeli}.
+\setacronymstyle{long-short}
+\newglossarystyle{acronymglossarystyle}{%
+    \renewcommand*{\acronymname}{List of Acronyms}
+    \setglossarystyle{altlong4colheader}% base this style on altlong4colheader
+    \setlength\LTleft{0pt}
+    \setlength\LTright{0pt}
+    \renewenvironment{theglossary} % Change the table type --> 3 columns
+        {\begin{longtable}{p{0.2\textwidth-2\tabcolsep}p{0.525\textwidth-3\tabcolsep}p{0pt}y{0.275\textwidth-3\tabcolsep}}}
+        {\end{longtable}}
+    \renewcommand*{\glossaryheader}{%
+        \bfseries Acronym
+        & \bfseries Explanation 
+        &  & \bfseries Pages \\
+        \hline \\
+        \endhead}
+}
+% \newacronym{accpy}  {ACCPY}      {\bb{ACC}elerator \bb{PY}thon module providing tools for accelerator physics}
+\newacronym{apd}    {APD}        {\bb{A}valanche \bb{P}hoto\bb{D}iode}
+%
+%=============================================================
+% GLOSSARY FOR SYMBOLS
+%=============================================================
+\glsaddkey{unit}{\glsentrytext{\glslabel}}{\glsentryunit}{\GLsentryunit}{\glsunit}{\Glsunit}{\GLSunit}
+\glssetnoexpandfield{unit}
+\newglossarystyle{symbolglossarystyle}{%
+\setglossarystyle{altlong4colheader} % base this style on altlong4colheader
+\setlength\LTleft{0pt}
+\setlength\LTright{0pt}
+\renewenvironment{theglossary} % Change the table type --> 4 columns
+    {\begin{longtable}{x{0.15\textwidth-2\tabcolsep}x{0.15\textwidth-2\tabcolsep}p{0.55\textwidth-2\tabcolsep}y{0.15\textwidth-2\tabcolsep}}}
+    {\end{longtable}}
+%  Change the table header
+\renewcommand*{\glossaryheader}{%
+      \bfseries Symbol
+    & \bfseries Unit
+    & \bfseries Description
+    & \bfseries Pages \tabularnewline
+    \hline\\\endhead
+    }
+% set how each entry should appear:
+\renewcommand*{\glossentry}[2]{%  Change the displayed items
+  \glstarget{##1}{\glossentryname{##1}} % symbol
+& \glsentryunit{##1} % unit
+& \glossentrydesc{##1}  % Description
+& ##2 % page number
+\tabularnewline}
+}
+\newcommand{\newsym}[5]{%
+\newglossaryentry{sym: #1}{% % to use symbol in text: \gls{mc}
+    name={\ensuremath{#2}},    % actual symbol for references,
+    text={\ensuremath{#3}},    % actual symbol for usage in text,
+    unit={\si{#4}},
+    description={#5},
+    type={symbols}             % all entries from this command will go
+                               % into the symbols glossary 
+}
+}
+% use command \sym instead of \gls for symbol glossary
+\newcommand{\sym}[1]{%
+\gls{sym: #1}%
+}
+\newcommand{\symnr}[1]{%
+\glsentrytext{sym: #1}
+}
+% greek letter symbols (.../var...)
+% Α       B      Γ       Δ       Ε         Ζ       Η    Θ       Ι      Κ       Λ        Μ    Ν    Ξ    Ο         Π    Ρ     Σ       Τ     Υ         Φ     Χ     Ψ     Ω
+% α       β      γ       δ       ε/ϵ       ζ       η    θ/ϑ     ι      κ/ϰ     λ        μ    ν    ξ    ο         π    ρ/ϱ   σ       τ     υ         φ/ϕ   χ     ψ     ω
+% alpha   beta   gamma   delta   epsilon   zeta   eta   theta   iota   kappa   lambda   mu   ny   xi   omikron   pi   rho   sigma   tau   ypsilon   phi   chi   psi   omega
+% \newsym{mc}         {\alpha_p}          {\alpha_p}          {}                      {momentum compaction factor}
+% \newsym{alpha}      {\alpha_{x,y}}      {\alpha}            {}                      {horizontal ($x$) or vertical ($y$) twiss function $\alpha$}
+%
+%=============================================================
+% GLOSSARY FOR CONSTANTS
+%=============================================================
+\newglossarystyle{constsglossarystyle}{
+\setglossarystyle{altlong4colheader} % base this style on altlong4colheader
+\setlength\LTleft{0pt}
+\setlength\LTright{0pt}
+\renewenvironment{theglossary} % Change the table type --> 3 columns
+    {\begin{longtable}{x{0.15\textwidth-2\tabcolsep}x{0.3\textwidth-2\tabcolsep}p{0.4\textwidth-2\tabcolsep}y{0.15\textwidth-2\tabcolsep}}}
+    {\end{longtable}}
+%  Change the table header
+\renewcommand*{\glossaryheader}{%
+      \bfseries Symbol
+    & \bfseries Value
+    & \bfseries Description
+    & \bfseries Pages \tabularnewline
+    \hline
+\\\endhead}
+% set how each entry should appear:
+\renewcommand*{\glossentry}[2]{ %  Change the displayed items
+\glstarget{##1}{
+      \glossentryname{##1}}     % symbol
+    & \glsentryunit{##1}        % unit
+    & \glossentrydesc{##1}      % Description
+    & ##2                       % page number
+\tabularnewline}
+}
+\newcommand{\newcnst}[5]{
+\newglossaryentry{cnst: #1}{    % to use symbol in text: \gls{mc}
+    name={\ensuremath{#2}},     % symbol
+    text={\ensuremath{#3}},     % actual symbol for usage in text,
+    unit={#4},                  % value
+    description={#5},           % description
+    type={constants}            % glossary key
+}
+}
+\newcommand{\cnst}[1]{
+\gls{cnst: #1}
+}
+\newcnst{I}         {\mathbb{1}_n}   {\mathbb{1}}    {$=\mathrm{diag}(1,1,\dots ,1)$}                    {n-dimensional identity matrix}
+\newcnst{cl}        {c_0}            {c_0}           {\SI{299 792 458}{\meter\per\second}}               {speed of light in vacuum}
+\newcnst{e}         {e}              {e}             {\SI{2.718281828459045235}{}}                       {exponential constant}
+\newcnst{i}         {i}              {i}             {$i^2=-1$}                                          {imaginary unit}
+\newcnst{qe}        {e}              {e}             {\SI{1.602176565e-19}{\ampere\second}}              {elementary charge}
+\newcnst{pi}        {\pi}            {\pi}           {\SI{3.14159 26535 89793 238}{}}                    {circle circumference to diameter ratio}
+\newcnst{mu0}       {\mu_0}          {\mu_0}         {\SI{4\pi e-7}{\newton\ampere\tothe{-2}}}           {vacuum permeability (magnetic constant)}
+\newcnst{eps0}      {\varepsilon_0}  {\varepsilon_0} {$=1/(\cnst{mu0}\cnst{cl}^2)$\si{\farad\per\meter}} {vacuum permittivity (electric constant)}
+%
+%=============================================================
+% METADATA FOR THE PDF
+%=============================================================
+\def\METAauthor           {Name Name}
+\def\METAdegreeold        {M.\,Sc.} %{M.\,Sc.}  % e.g. B. Sc.
+\def\METAstudentnr        {xxx}
+\def\METAtitle            {Title}
+\def\METAsubtitle         {TBD}
+\def\METAdoctype          {DISSERTATION}  % e.g. Bachelor's Thesis, Master's Thesis, Dissertation  ('s! - https://en.oxforddictionaries.com/definition/master's_degree)
+\def\METAsupervisora      {Prof. Dr. }
+\def\METAsupervisorb      {Prof. Dr. }
+\def\METAsupervisorc      {Prof. Dr. }
+\def\METAuniversity       {Humboldt-Universität zu Berlin}  % e. g., Humboldt-Universit\"at zu Berlin
+\def\METApresident        {Prof. Dr.-Ing. Dr. }  % president of the university
+\def\METAfaculty          {Faculty of Mathematics and Natural Sciences}  % in Dativ/Genitiv! e. g., Mathematisch-Naturwissenschaftlichen Fakult\"at II
+\def\METAdeanf            {Prof. Dr. } % dean of the faculty
+\def\METAinstitue         {Department of Physics} % in Dativ/Genitiv! e. g., Mathematisch-Naturwissenschaftlichen Fakult\"at II
+\def\METAdeani            {Prof. Dr. } % dean of the faculty
+\def\METAdegree           {doctor rerum naturalium\\(Dr. rer. nat.)}  % e. g., Dr. Rer. Nat.
+\def\METAsubject          {physics}  % e. g., Physik
+\def\METAsubsubject       {experimental physics}
+\def\METAdocsubject       {accelerator physics}  % subject of the thesis (used in the properties of the pdf-document)
+\def\METAdatesubmitted    {Monday, 02.12.2021} %GOAL: Friday, 25.09.2015}, % the date of the submission
+\def\METAdateexam         {exam date} % the date of your last exam
+\def\METAkeywordsen       {keyword1, % english keywords
+                           keyword2, 
+                           keyword3, 
+                           keyword4} 
+\def\METAkeywordsde       {Stichwort1, % german keywords
+                           Stichwort2,
+                           Stichwort3,
+                           Stichwort4}
+\def\METAlangpdf          {en-GB} % not working? use workaround below...% language of thesis,e. g., en, ger
+\def\METAacademicyear     {20xx/20xx}
+\def\METAhandin           {Thursday, xxth of month, 20xx}
+\def\METAgradsession      {Friday, xxth of month, 20xx}%Wednesday, xxth of Month, 2021}
+%
+%=============================================================
+% SPEED UP TEX COMPILATION
+%=============================================================
+%% When only working on one include file from layout for speed up 
+%% ! full preceding compilation required for correct referencing
+%% ! only compile using pdflatex (no biber !)
+%
+%\includeonly{content/frontmatter/01\string_titlepage}
+%\includeonly{content/frontmatter/02\string_abstract}
+%\includeonly{content/frontmatter/03\string_acknowledgements}    
+%\includeonly{content/frontmatter/04\string_declaration}   
+%\includeonly{content/frontmatter/05\string_dedication}
+%
+%\includeonly{content/mainmatter/01\string_intro}
+%\includeonly{content/mainmatter/02\string_}
+%\includeonly{content/mainmatter/03\string_}
+%\includeonly{content/mainmatter/04\string_}
+%\includeonly{content/mainmatter/05\string_}
+%\includeonly{content/mainmatter/06\string_}
+%\includeonly{content/mainmatter/07\string_}
+%\includeonly{content/mainmatter/08\string_conclusion}
+%
+%\includeonly{content/backmatter/01\string_}
+%\includeonly{content/backmatter/02\string_}
+%\includeonly{content/backmatter/03\string_}
+%\includeonly{content/backmatter/04\string_}
+%
+%=============================================================
+% THE DOCUMENT
+%=============================================================
+\begin{document}
+  % flag acronyms you don't want to have printed with the spelled out version or explanation at first use
+  % \glsunset{biii}
+  % \glsunset{fodo}
+  % \glsunset{hzb}
+  % \glsunset{qed}
+  % \glsunset{qcd}
+  % visualize overfull problems
+  %\overfullrule=2cm
+  % Write dissertation.xmpdata file with all metadata for pdfx using the metadata definitions from main dissertatiocdn.tex
+  \newoutputstream{metadata}
+  \openoutputfile{\jobname.xmpdata}{metadata}
+  \addtostream{metadata}{
+    \protect\Title{\METAtitle}^^J
+    \protect\Subject{\METAsubject, \METAsubsubject, \METAdocsubject}^^J
+    \protect\Author{\METAauthor}^^J
+    \protect\Keywords{\METAkeywordsen; \METAkeywordsde}^^J
+    \protect\Publisher{\METAuniversity}^^J
+    %\protect\pdfxSetRGBcolorProfileDir{/home/lmt/nextCloud/phd_thesis/color/}^^J
+    \protect\setRGBcolorprofile{./color/eciRGB_v2.icc}{eciRGB_v2}{ECI RGB}{http://www.eci.org/en/start}^^J                       
+        }
+  % BUGFIX/Workaround for showing otherwise lost metadata in e.g. evince, okular, ...
+  \makeatletter
+  % fix overfull hbox for bold (chapters) numbers over 100:
+  \renewcommand\@pnumwidth{2em}
+  \def\sep{; }
+  \pdfx@topdfstring\pdfx@Author\xmp@Author
+  \pdfx@topdfstring\pdfx@Keywords\xmp@Keywords
+  \makeatother
+  %
+  %=============================================================
+  % LAYOUT
+  %=============================================================
+  %
+  \frontmatter
+    \pdfbookmark[0]{Title}{Title}
+    \include{content/frontmatter/01\string_titlepage}
+    \include{content/frontmatter/02\string_abstract}
+    %\include{content/frontmatter/03\string_dedication}
+    \printnoidxglossary[type=acronym, style=acronymglossarystyle]
+    %\printnoidxglossary[type=constants, style=constsglossarystyle]
+    %\printnoidxglossary[type=symbols, style=symbolglossarystyle]
+    \setcounter{tocdepth}{2}
+    \cleardoublepage
+    \phantomsection
+    \pdfbookmark[0]{Contents}{Contents}
+    \tableofcontents
+  \mainmatter
+    \include{content/mainmatter/01\string_intro}
+    %\include{content/mainmatter/0x\string_content_test}
+    \include{content/mainmatter/02\string_chapter2}
+    % ...
+    %\include{content/mainmatter/xx\string_conclusion}
+  \appendix
+    \include{content/appendix/01\string_appendixA}
+    % ...
+  \backmatter
+    \phantomsection
+      \addcontentsline{toc}{chapter}{\listfigurename}	
+      \listoffigures
+      \cleardoublepage
+    \phantomsection
+      \addcontentsline{toc}{chapter}{\listtablename}
+      \listoftables
+      \cleardoublepage
+    \printbibliography[heading=bibintoc]
+      \cleardoublepage
+    \phantomsection
+      \addcontentsline{toc}{chapter}{Acknowledgements}
+      \include{content/backmatter/01\string_acknowledgements}
+      \cleardoublepage
+    \phantomsection
+      \include{content/backmatter/02\string_declaration}
+      %\includepdf{content/backmatter/scan_declaration_p183.pdf} %only for online submission, not for publication!!!
+    %
+\end{document}

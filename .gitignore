@@ -1,0 +1,44 @@
+# Don't track content of these folders
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.toc
+*.xml
+
+
+# Packages #
+############
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# BACKUP/ LOG Files #
+#########################
+*.log
+*.pyc
+*.py~
+
+.ipynb_checkpoints/*
+*/.ipynb_checkpoints/*
+*/*/.ipynb_checkpoints/*
+*/*/*/.ipynb_checkpoints/*
